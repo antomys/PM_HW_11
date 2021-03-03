@@ -24,7 +24,7 @@ namespace DepsWebApp.Middlewares
         public async Task Invoke(HttpContext context)
         {
             
-            _logger.LogWarning("Request body: {0}",await ObtainRequestBody(context.Request));
+            _logger.LogInformation("Request body: {0}",await ObtainRequestBody(context.Request));
 
             var originalResponseBody = context.Response.Body;
 
