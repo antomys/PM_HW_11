@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using DepsWebApp.Clients;
+using DepsWebApp.Middlewares;
 using DepsWebApp.Options;
 using DepsWebApp.Services;
 using Microsoft.AspNetCore.Hosting;
@@ -69,6 +70,7 @@ namespace DepsWebApp
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "DI Demo App API v1"));
             }
 
+            app.UseMiddleware<LoggingMiddleware>();
             app.UseRouting();
 
             app.UseAuthorization();
