@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -19,23 +20,31 @@ namespace PM_HW_11.Task_2.Input
             _model = InputModel.Construct();
         }
         
-        public async Task TestRegistration(HttpClient httpClient)
+        public static async Task TestRegistration(HttpClient httpClient)
         {
-            //todo: make it 10 times
-            var tasks = _model.Registration.Select(x => InternalTestRegistration(httpClient, x.Key, x.Value));
-            await Task.WhenAll(tasks);
+            var listOfTasks = new List<Task>();
+
+            var thisString = _model.Registration.Keys.First();
+             _model.Registration.TryGetValue(thisString, out var thisCode);
+             
+             for (var i = 0; i < 10; i++)
+            {
+                listOfTasks
+                    .Add(InternalTestRegistration(httpClient,thisString,thisCode));
+            }
+            await Task.WhenAll(listOfTasks);
             
 
         }
 
-        public async Task TestCurrencyConverter(HttpClient httpClient)
+        public static async Task TestCurrencyConverter(HttpClient httpClient)
         {
-            /*var tasks 
-                = await Task.Factory.StartNew(() => GetPrimes.Select(pair => InternalTestCurrencyConverter(httpClient, pair.Key, pair.Value)));*/
             
             var tasks 
                 = await Task.Factory.StartNew(() => 
-                    _model.CurrencyChanger.Select(pair => InternalTestCurrencyConverter(httpClient, pair.Key, pair.Value)));
+                    _model.CurrencyChanger
+                        .Select(pair => 
+                            InternalTestCurrencyConverter(httpClient, pair.Key, pair.Value)));
             await Task.WhenAll(tasks);
 
         }
@@ -61,9 +70,11 @@ namespace PM_HW_11.Task_2.Input
                 var errorDeserialized = JsonSerializer.Deserialize<ErrorModel>(responseBody);
                 
                 if(errorDeserialized != null)
-                    Console.WriteLine($"Input URL: [{inputUri}]\n" + 
+                    Console.WriteLine($"Input URL: [{inputUri}]\n" +
+                                      $"Input Body: {inputModel}\n" + 
                                       $"Expected Error code: [{value}]\n" +
                                       $"Received error code: [{errorDeserialized.Code}]\n" +
+                                      $"Received Body: {errorDeserialized}" +
                                       $"Test passed: [{value == errorDeserialized.Code}]\n");
             }
             catch(HttpRequestException e)
@@ -88,6 +99,7 @@ namespace PM_HW_11.Task_2.Input
                 if ((int)responseMessage.StatusCode != (int)HttpStatusCode.OK)
                 {
                     Console.WriteLine($"Input URL: [{inputUri}]\nExpected Code:[{expectedStatusCode}]\n" +
+                                      $"Received body {responseBody}\n" +
                                       $"Received Code:[{responseMessage.StatusCode}]\n" +
                                       $"Test passed: [{responseMessage.StatusCode == expectedStatusCode}]\n");
                 }
@@ -98,6 +110,7 @@ namespace PM_HW_11.Task_2.Input
                         var errorDeserialized = JsonSerializer.Deserialize<ErrorModel>(responseBody);
                         Console.WriteLine($"Input URL: [{inputUri}]\nExpected Custom Error:[{expectedCustomErrorCode}]\n" +
                                           $"Received Code:[{errorDeserialized.Code}]\n" +
+                                          $"Received Body: {errorDeserialized}\n" +
                                           $"Test passed: [{errorDeserialized.Code.ToString() == expectedCustomErrorCode}]\n");
                         //This is where i convert int code number to string to check custom error code with deserialized response custom error code
                         //because in connectionUrl this custom codes are strings
@@ -107,6 +120,7 @@ namespace PM_HW_11.Task_2.Input
                         var responseNumber = Convert.ToDecimal(responseBody); 
                         Console.WriteLine($"Input URL: [{inputUri}]\nExpected :[typeof(Decimal)]\n" +
                                               $"Received :[{responseNumber.GetType().Name}]\n" +
+                                              $"Received Body:{responseNumber}\n" +
                                               $"Test passed: [{responseNumber.GetType().Name == "Decimal"}]\n");
                     }
                 }

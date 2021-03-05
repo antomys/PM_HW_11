@@ -15,9 +15,9 @@ namespace PM_HW_11.Task_2
             var input = new Input.Input();
             
             Console.WriteLine("*********************************************");
-            await input.TestRegistration(Client);
+            await Input.Input.TestRegistration(Client);
             Console.WriteLine("*********************************************");
-            await input.TestCurrencyConverter(Client);
+            await Input.Input.TestCurrencyConverter(Client);
         }
         
     }

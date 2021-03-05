@@ -9,5 +9,10 @@ namespace PM_HW_11.Task_2.Models
         
         [JsonPropertyName("message")]
         public string ErrorMessage { get; set; }
+
+        public override string ToString()
+        {
+            return $"Code: {Code}; Message: {ErrorMessage}";
+        }
     }
 }
