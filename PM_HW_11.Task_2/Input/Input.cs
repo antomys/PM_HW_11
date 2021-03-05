@@ -20,7 +20,7 @@ namespace PM_HW_11.Task_2.Input
             _model = InputModel.Construct();
         }
         
-        public static async Task TestRegistration(HttpClient httpClient)
+        public async Task TestRegistration(HttpClient httpClient)
         {
             var listOfTasks = new List<Task>();
 
@@ -37,7 +37,7 @@ namespace PM_HW_11.Task_2.Input
 
         }
 
-        public static async Task TestCurrencyConverter(HttpClient httpClient)
+        public async Task TestCurrencyConverter(HttpClient httpClient)
         {
             
             var tasks 

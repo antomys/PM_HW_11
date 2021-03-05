@@ -13,11 +13,10 @@ namespace PM_HW_11.Task_2
         {
             Client.BaseAddress = new Uri("http://localhost:5000");
             var input = new Input.Input();
-            
             Console.WriteLine("*********************************************");
-            await Input.Input.TestRegistration(Client);
+            await input.TestRegistration(Client);
             Console.WriteLine("*********************************************");
-            await Input.Input.TestCurrencyConverter(Client);
+            await input.TestCurrencyConverter(Client);
         }
         
     }
