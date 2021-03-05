@@ -1,76 +1,70 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Text.RegularExpressions;
+using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
+using PM_HW_11.Task_2.Models;
 
 namespace PM_HW_11.Task_2.Input
 {
     public class Input
     {
+        private static InputModel _model;
+        private static readonly Random Random = new();
         public Input()
         {
-            InputModel.Construct();
+            _model = InputModel.Construct();
         }
-
-        public static async Task TestLandingPage(HttpClient httpClient)
+        
+        public async Task TestRegistration(HttpClient httpClient)
         {
-            var result = false;
-            try
-            {
-                var responseMessage
-                    = await httpClient.GetAsync(httpClient.BaseAddress);
-                responseMessage.EnsureSuccessStatusCode();
-                var responseBody = await responseMessage.Content.ReadAsStringAsync();
-                const string expectedOutput = "Ihor Volokhovych, PM_HW_10, PM_HW_10.Task_1";
-
-                if (responseBody.Equals(expectedOutput))
-                {
-                    result = true;
-                }
-                Console.WriteLine($"Input URL: [{LandingTest}]\n" +
-                                  $"Expected: [{expectedOutput}]\n" +
-                                  $"Received: [{responseBody}]\n" +
-                                  $"Test passed: [{result.ToString()}]\n");
-                
-            }
-            catch(HttpRequestException e)
-            {
-                Console.WriteLine("\nException Caught!");	
-                Console.WriteLine("Message :{0} ",e.Message);
-            }
-        }
-
-        public static async Task TestIsPrime(HttpClient httpClient)
-        {
-            var tasks = IsPrime
-                .Select(pair => InternalTestIsPrime(httpClient, pair.Key, pair.Value));
+            //todo: make it 10 times
+            var tasks = _model.Registration.Select(x => InternalTestRegistration(httpClient, x.Key, x.Value));
             await Task.WhenAll(tasks);
             
 
         }
 
-        public async Task TestGetPrimes(HttpClient httpClient)
+        public async Task TestCurrencyConverter(HttpClient httpClient)
         {
+            /*var tasks 
+                = await Task.Factory.StartNew(() => GetPrimes.Select(pair => InternalTestCurrencyConverter(httpClient, pair.Key, pair.Value)));*/
+            
             var tasks 
-                = await Task.Factory.StartNew(() => GetPrimes.Select(pair => InternalTestGetPrimes(httpClient, pair.Key, pair.Value)));
+                = await Task.Factory.StartNew(() => 
+                    _model.CurrencyChanger.Select(pair => InternalTestCurrencyConverter(httpClient, pair.Key, pair.Value)));
             await Task.WhenAll(tasks);
 
         }
         
-        private static async Task InternalTestIsPrime(HttpClient httpClient, string key, HttpStatusCode value)
+        private static async Task InternalTestRegistration(HttpClient httpClient, string key, int value)
         {
             var inputUri = new Uri(httpClient.BaseAddress + key);
             try
             {
-                var responseMessage = await httpClient.GetAsync(inputUri);
+                var inputModel = new LoginModel()
+                {
+                    Login = RandomString(),
+                    Password = RandomString()
+                };
+                var serialized = JsonSerializer.Serialize(inputModel);
+                HttpContent content = 
+                    new StringContent(serialized, Encoding.UTF8,"application/json");
                 
-                Console.WriteLine($"Input URL: [{inputUri}]\n" +
-                                  $"Expected: [{value}]\n" +
-                                  $"Received: [{responseMessage.StatusCode}]\n" +
-                                  $"Test passed: [{value == responseMessage.StatusCode}]\n");
+                var responseMessage = await httpClient.PostAsync(inputUri,content);
+                
+                var responseBody = await responseMessage.Content.ReadAsStringAsync();
+                
+                var errorDeserialized = JsonSerializer.Deserialize<ErrorModel>(responseBody);
+                
+                if(errorDeserialized != null)
+                    Console.WriteLine($"Input URL: [{inputUri}]\n" + 
+                                      $"Expected Error code: [{value}]\n" +
+                                      $"Received error code: [{errorDeserialized.Code}]\n" +
+                                      $"Test passed: [{value == errorDeserialized.Code}]\n");
             }
             catch(HttpRequestException e)
             {
@@ -78,37 +72,43 @@ namespace PM_HW_11.Task_2.Input
                 Console.WriteLine("Message :{0} ",e.Message);
             }
         }
-
-        private static async Task InternalTestGetPrimes(HttpClient httpClient, string key, IReadOnlyCollection<int> value)
+        private static async Task InternalTestCurrencyConverter(HttpClient httpClient, string key, 
+            ConcurrentDictionary<string,HttpStatusCode> value)
         {
             try
             {
+                var expectedCustomErrorCode  = value.Keys.First();
+                value.TryGetValue(expectedCustomErrorCode, out var expectedStatusCode);
+                
                 var inputUri = httpClient.BaseAddress + key;
+                
                 var responseMessage = await httpClient.GetAsync(inputUri);
                 var responseBody = await responseMessage.Content.ReadAsStringAsync();
-                responseBody = Regex.Replace(responseBody, @"[\[\]]", "");  
-               
-                if (responseMessage.StatusCode.Equals(HttpStatusCode.OK))
+
+                if ((int)responseMessage.StatusCode != (int)HttpStatusCode.OK)
                 {
-                    var numbers = new List<int>();
-                    
-                    if (!string.IsNullOrEmpty(responseBody) && responseBody.Any(char.IsDigit))
-                    {
-                        numbers =  responseBody.Split(',').Select(int.Parse).ToList();
-                    }
-                    
-                    if (value.All(numbers.Contains) && value.Count == numbers.Count)
-                    {
-                        Console.WriteLine($"Input URL: [{inputUri}]\nExpected: [{string.Join(",", value)}]\n" +
-                                          $"Received: [{responseBody}]\n" +
-                                          $"Test passed: [{true}]\n");
-                    }
+                    Console.WriteLine($"Input URL: [{inputUri}]\nExpected Code:[{expectedStatusCode}]\n" +
+                                      $"Received Code:[{responseMessage.StatusCode}]\n" +
+                                      $"Test passed: [{responseMessage.StatusCode == expectedStatusCode}]\n");
                 }
                 else
                 {
-                    Console.WriteLine($"Input URL: [{inputUri}]\nExpected Code:[{HttpStatusCode.BadRequest}]\n" +
-                                      $"Received Code:[{responseMessage.StatusCode}]\n" +
-                                      $"Test passed: [{responseMessage.StatusCode == HttpStatusCode.BadRequest}]\n");
+                    try
+                    {
+                        var errorDeserialized = JsonSerializer.Deserialize<ErrorModel>(responseBody);
+                        Console.WriteLine($"Input URL: [{inputUri}]\nExpected Custom Error:[{expectedCustomErrorCode}]\n" +
+                                          $"Received Code:[{errorDeserialized.Code}]\n" +
+                                          $"Test passed: [{errorDeserialized.Code.ToString() == expectedCustomErrorCode}]\n");
+                        //This is where i convert int code number to string to check custom error code with deserialized response custom error code
+                        //because in connectionUrl this custom codes are strings
+                    }
+                    catch (Exception)
+                    { 
+                        var responseNumber = Convert.ToDecimal(responseBody); 
+                        Console.WriteLine($"Input URL: [{inputUri}]\nExpected :[typeof(Decimal)]\n" +
+                                              $"Received :[{responseNumber.GetType().Name}]\n" +
+                                              $"Test passed: [{responseNumber.GetType().Name == "Decimal"}]\n");
+                    }
                 }
             }
             catch(HttpRequestException e)
@@ -116,6 +116,12 @@ namespace PM_HW_11.Task_2.Input
                 Console.WriteLine("\nException Caught!");	
                 Console.WriteLine("Message :{0} ",e.Message);
             }
+        }
+        private static string RandomString()
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, Random.Next(6,10))
+                .Select(s => s[Random.Next(s.Length)]).ToArray());
         }
     }
 }

@@ -1,40 +1,97 @@
 ﻿{
-  "landingtest": "http://localhost:5000/",
-  "isprime": {
-    "primes/0": 404,
-    "primes/2": 200,
-    "primes/string": 400,
-    "primes/-250": 404,
-    "primes/dfhfdg": 400,
-    "primes/5215215": 404,
-    "primes/-215-21": 400,
-    "primes//f8f6d": 404,
-    "primes/gfds": 400,
-    "primes/2j1j4h": 400,
-    "primes/00000": 404,
-    "primes/-99999": 404,
-    "primes/11": 200,
-    "primes/1": 404,
-    "primes/51673": 200
+  "registration": {
+    "Auth": 13
   },
-  "getprimes": {
-    "primes?from=-402&to=1": [],
-    "primes?from=-100&to=4": [
-      2,
-      3
-    ],
-    "primes?from=0&to=5": [
-      2,
-      3,
-      5
-    ],
-    "primes?from=400&to=5": [],
-    "primes?from=string&to=string": [],
-    "primes?from=0&to=10": [
-      2,
-      3,
-      5,
-      7
-    ]
+  "currencychanger": {
+    "Rates/SAR/MXN?amount=87002": {
+      "": 200
+    },
+    "Rates/EXJA/7V0YD?amount=9083": {
+      "": 400
+    },
+    "Rates/WOAVV/URBOJDX?amount=6062": {
+      "": 400
+    },
+    "Rates/CNY/KRW?amount=-10492": {
+      "19": 200
+    },
+    "Rates/KRW/KRW?amount=66074": {
+      "": 200
+    },
+    "Rates/MXN/MXN?amount=47478": {
+      "": 200
+    },
+    "Rates/QXOFTZ/B38VMH?amount=9006": {
+      "": 400
+    },
+    "Rates/MXN/CAD?amount=-5605": {
+      "19": 200
+    },
+    "Rates/KRW/MXN?amount=-12617": {
+      "19": 200
+    },
+    "Rates/E2Q4G/ZG0?amount=8326": {
+      "": 400
+    },
+    "Rates/USD/CNY?amount=-78460": {
+      "19": 200
+    },
+    "Rates/TND/CZK?amount=24091": {
+      "": 200
+    },
+    "Rates/MAD/UAH?amount=4829": {
+      "": 200
+    },
+    "Rates/TND/UAH?amount=9577": {
+      "": 200
+    },
+    "Rates/USD/TND?amount=-81290": {
+      "19": 200
+    },
+    "Rates/DKK/EUR?amount=-61010": {
+      "19": 200
+    },
+    "Rates/MYR/DKK?amount=1870": {
+      "": 200
+    },
+    "Rates/L19PN/RVAL1ZO?amount=2883": {
+      "": 400
+    },
+    "Rates/SAR/CZK?amount=90948": {
+      "": 200
+    },
+    "Rates/USD/SAR?amount=84098": {
+      "": 200
+    },
+    "Rates/KIFDDE1/RKDY?amount=5915": {
+      "": 400
+    },
+    "Rates/MYR/KRW?amount=-1535": {
+      "19": 200
+    },
+    "Rates/EUR/MYR?amount=-62294": {
+      "19": 200
+    },
+    "Rates/SAR/UAH?amount=-81795": {
+      "19": 200
+    },
+    "Rates/SGD/UAH?amount=79556": {
+      "": 200
+    },
+    "Rates/CW4F/1S3RK?amount=5636": {
+      "": 400
+    },
+    "Rates/UAH/USD?amount=-5586": {
+      "19": 200
+    },
+    "Rates/KG1/QGXNT?amount=5802": {
+      "": 400
+    },
+    "Rates/Q63ENN/F9GXO33?amount=9488": {
+      "": 400
+    },
+    "Rates/HYM1R5/B6Y?amount=1831": {
+      "": 400
+    }
   }
 }
