@@ -1,0 +1,40 @@
+﻿{
+  "landingtest": "http://localhost:5000/",
+  "isprime": {
+    "primes/0": 404,
+    "primes/2": 200,
+    "primes/string": 400,
+    "primes/-250": 404,
+    "primes/dfhfdg": 400,
+    "primes/5215215": 404,
+    "primes/-215-21": 400,
+    "primes//f8f6d": 404,
+    "primes/gfds": 400,
+    "primes/2j1j4h": 400,
+    "primes/00000": 404,
+    "primes/-99999": 404,
+    "primes/11": 200,
+    "primes/1": 404,
+    "primes/51673": 200
+  },
+  "getprimes": {
+    "primes?from=-402&to=1": [],
+    "primes?from=-100&to=4": [
+      2,
+      3
+    ],
+    "primes?from=0&to=5": [
+      2,
+      3,
+      5
+    ],
+    "primes?from=400&to=5": [],
+    "primes?from=string&to=string": [],
+    "primes?from=0&to=10": [
+      2,
+      3,
+      5,
+      7
+    ]
+  }
+}

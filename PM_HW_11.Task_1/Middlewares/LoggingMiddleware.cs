@@ -8,11 +8,19 @@ using Microsoft.Extensions.Logging;
 
 namespace DepsWebApp.Middlewares
 {
+    /// <summary>
+    /// Middleware to log raw data
+    /// </summary>
     public class LoggingMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
 
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="next"></param>
+        /// <param name="loggerFactory"></param>
         public LoggingMiddleware(
             RequestDelegate next,
             ILoggerFactory loggerFactory)
@@ -21,6 +29,11 @@ namespace DepsWebApp.Middlewares
             _logger = loggerFactory.CreateLogger<LoggingMiddleware>();
         }
 
+        /// <summary>
+        /// Invoke method of logging.
+        /// </summary>
+        /// <param name="context"></param>
+        /// <returns></returns>
         public async Task Invoke(HttpContext context)
         {
             
@@ -58,7 +71,6 @@ namespace DepsWebApp.Middlewares
             request.Body.Seek(0, SeekOrigin.Begin);
             return bodyStr;
         }
-
         private static async Task<string> ObtainResponseBody(HttpContext context)
         {
             var response = context.Response;
@@ -91,12 +103,10 @@ namespace DepsWebApp.Middlewares
             }
             return Encoding.GetEncoding(contentType.CharSet, EncoderFallback.ExceptionFallback, DecoderFallback.ExceptionFallback);
         }
-
         private static LogLevel GetLogLevel(int? statusCode)
         {
             return statusCode > 399 ? LogLevel.Error : LogLevel.Information;
         }
-
         private static int? GetStatusCode(HttpContext context)
         {
             return context.Response?.StatusCode;

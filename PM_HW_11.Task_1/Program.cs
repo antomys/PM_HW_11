@@ -3,8 +3,15 @@ using Microsoft.Extensions.Hosting;
 
 namespace DepsWebApp
 {
+    /// <summary>
+    /// Main program entry
+    /// </summary>
     public static class Program
     {
+        /// <summary>
+        /// Main method. Here begins program
+        /// </summary>
+        /// <param name="args">arguments as string array</param>
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
