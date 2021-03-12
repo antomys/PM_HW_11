@@ -36,11 +36,15 @@ namespace DepsWebApp.Middlewares
         /// <returns></returns>
         public async Task Invoke(HttpContext context)
         {
-            
-            _logger.LogInformation("Request body: {0}",await ObtainRequestBody(context.Request));
+            var requestInformation = $"Request information:\n" +
+                                     $"Schema:{context.Request.Scheme}\n" +
+                                     $"Host:{context.Request.Host}\n" +
+                                     $"Path:{context.Request.Path}\n" +
+                                     $"QueryString:{context.Request.QueryString}\n" +
+                                     $"Request Body:{await ObtainRequestBody(context.Request)}\n";
+            _logger.LogInformation(requestInformation);
 
             var originalResponseBody = context.Response.Body;
-
             await using var responseBody = new MemoryStream();
             
             context.Response.Body = responseBody;
@@ -48,8 +52,7 @@ namespace DepsWebApp.Middlewares
 
             var status = GetStatusCode(context);
             var level = GetLogLevel(status);
-            
-            
+
             _logger.Log(level, "Response body: LogLevel: {0}; Code: {1}\n Body: {2}",
                 GetLogLevel(status),status,await ObtainResponseBody(context));
 
