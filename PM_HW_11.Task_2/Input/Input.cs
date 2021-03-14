@@ -30,7 +30,7 @@ namespace PM_HW_11.Task_2.Input
             var thisString = _model.Registration.Keys.First();
              _model.Registration.TryGetValue(thisString, out var thisCode);
              
-             for (var i = 0; i < 100; i++)
+             for (var i = 0; i < 10; i++)
             {
                 listOfTasks
                     .Add(InternalTestRegistration(httpClient,thisString,thisCode,true));
@@ -125,19 +125,16 @@ namespace PM_HW_11.Task_2.Input
                 
                 var inputUri = httpClient.BaseAddress + key;
 
-                httpClient.DefaultRequestHeaders.Add("Authorization", $"Basic {token}");
+                httpClient.DefaultRequestHeaders.Authorization 
+                    = new AuthenticationHeaderValue("base64", token);
                 
                 var responseMessage = await httpClient.GetAsync(inputUri);
                 var responseBody = await responseMessage.Content.ReadAsStringAsync();
 
                 if ((int)responseMessage.StatusCode == (int)HttpStatusCode.Unauthorized)
-                {
-                    Console.WriteLine($"Input URL: [{inputUri}]\n" +
-                                      $"Expected Code:[{HttpStatusCode.Unauthorized}]\n" +
-                                      $"Received body {responseBody}\n" +
-                                      $"Received Code:[{responseMessage.StatusCode}]\n" +
-                                      $"Test passed: [{responseMessage.StatusCode == HttpStatusCode.Unauthorized}]\n");
-                }
+                    Output(inputUri,(int)HttpStatusCode.Unauthorized,responseMessage);
+                else if ((int) responseMessage.StatusCode != (int) HttpStatusCode.OK)
+                    Output(inputUri,(int)expectedStatusCode,responseMessage,responseBody);
                 else
                 {
                     try
@@ -177,8 +174,18 @@ namespace PM_HW_11.Task_2.Input
                 .Select(s => s[Random.Next(s.Length)]).ToArray());
         }
         private static string Base64Encode(string plainText) {
-            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+            var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
             return System.Convert.ToBase64String(plainTextBytes);
+        }
+
+        private static void Output(string inputUri, int expectedCode, 
+            HttpResponseMessage responseBody, string responseMessage = "")
+        {
+            Console.WriteLine($"Input URL: [{inputUri}]\n" +
+                              $"Expected Code:[{expectedCode}]\n" +
+                              $"Received body {responseMessage}\n" +
+                              $"Received Code:[{responseBody.StatusCode}]\n" +
+                              $"Test passed: [{responseBody.StatusCode == (HttpStatusCode) expectedCode}]\n");
         }
         
         private static string Base64Decode(string base64EncodedData) {
