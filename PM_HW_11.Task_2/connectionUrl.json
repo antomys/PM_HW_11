@@ -92,6 +92,48 @@
     },
     "Rates/HYM1R5/B6Y?amount=1831": {
       "": 400
+    },
+    "Rates/KRW/KRW?amount=0": {
+      "": 200
+    },
+    "Rates/KRW/KRW?amount=1": {
+      "": 200
+    },
+    "Rates/KRW/KRW?amount=26074": {
+      "": 200
+    },
+    "Rates/KRW/KRW?amount=6614": {
+      "": 200
+    },
+    "Rates/KRW/KRW?amount=666574": {
+      "": 200
+    },
+    "Rates/UAH/KRW?amount=61274": {
+      "": 200
+    },
+    "Rates/EUR/KRW?amount=32074": {
+      "": 200
+    },
+    "Rates/GBP/UAH?amount=1274": {
+      "": 200
+    },
+    "Rates/EUR/USD?amount=6685474": {
+      "": 200
+    },
+    "Rates/RUB/EUR?amount=6604564": {
+      "": 200
+    },
+    "Rates/EUR/RUB?amount=66544": {
+      "": 200
+    },
+    "Rates/UAH/RUB?amount=667854": {
+      "": 200
+    },
+    "Rates/KRW/KRW?amount=63214": {
+      "": 200
+    },
+    "Rates/KRW/KRW?amount=6254": {
+      "": 200
     }
   }
 }
