@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using DepsWebApp.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,6 +50,15 @@ namespace DepsWebApp
             
             // Add application services
             services.AddScoped<IRatesService, RatesService>();
+            
+            // Add service for Authentication
+            services
+                .AddAuthentication(Base64Scheme.Name)
+                .AddScheme<Base64SchemeOptions, Base64AuthenticationHandler>(
+                    Base64Scheme.Name, Base64Scheme.Name, null);
+            
+            //Add Account services for storing account <SINGLETON>
+            services.AddSingleton<IAccountService, AccountService>();
 
             // Add NbuClient as Transient
             services.AddHttpClient<IRatesProviderClient, NbuClient>()
@@ -63,6 +73,35 @@ namespace DepsWebApp
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                     c.IncludeXmlComments(xmlPath);
                     c.SwaggerDoc("v1", new OpenApiInfo { Title = "DI Demo App API", Version = "v1" });
+                    
+                    //Adding security requirements to the project
+                    c.AddSecurityRequirement(
+                        new OpenApiSecurityRequirement
+                        {
+                            {
+                                new OpenApiSecurityScheme
+                                {
+                                    Reference = new OpenApiReference
+                                    {
+                                        Id = "Base64Credentials",
+                                        Type = ReferenceType.SecurityScheme
+                                    },
+                                },
+                                new string[0]
+                            }
+                        });
+
+                    c.AddSecurityDefinition(
+                        "Base64Credentials",
+                        new OpenApiSecurityScheme
+                        {
+                            Type = SecuritySchemeType.ApiKey,
+                            In = ParameterLocation.Header,
+                            Scheme = "Base64",
+                            Name = "Authorization",
+                            Description = "Base64 Authentication",
+                            BearerFormat = "Base64"
+                        });
             });
 
             // Add batch of framework services
@@ -89,6 +128,7 @@ namespace DepsWebApp
             app.UseMiddleware<LoggingMiddleware>();
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

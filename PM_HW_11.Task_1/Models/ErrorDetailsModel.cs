@@ -18,6 +18,16 @@ namespace DepsWebApp.Models
         /// </summary>
         [JsonPropertyName("message")]
         public string ErrorMessage { get; set; }
-        
+
+        /// <summary>
+        /// Constructor with parameters.
+        /// </summary>
+        /// <param name="errorCode">Error code</param>
+        /// <param name="errorMessage">Error message</param>
+        public ErrorDetailsModel(int? errorCode, string errorMessage)
+        {
+            ErrorCode = errorCode;
+            ErrorMessage = errorMessage;
+        }
     }
 }

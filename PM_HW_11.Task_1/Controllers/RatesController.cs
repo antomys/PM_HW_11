@@ -1,9 +1,12 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
+using DepsWebApp.Authentication;
 using DepsWebApp.Middlewares;
 using DepsWebApp.Services;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DepsWebApp.Controllers
 {
@@ -11,6 +14,7 @@ namespace DepsWebApp.Controllers
     /// Change currencies
     /// </summary>
     [ApiController]
+    [Authorize]
     [Route("[controller]")]
     public class RatesController : ControllerBase
     {
@@ -37,14 +41,24 @@ namespace DepsWebApp.Controllers
         /// <param name="dstCurrency">Destination currency</param>
         /// <param name="amount">Amount to convert</param>
         /// <returns>Converted currency</returns>
+        [Authorize]
         [HttpGet("{srcCurrency}/{dstCurrency}")]
         [TypeFilter(typeof(CustomExceptionFilter))]
         [ProducesResponseType(typeof(int), (int) HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string), (int) HttpStatusCode.BadRequest)]
         public async Task<ActionResult<decimal>> Get(string srcCurrency, string dstCurrency, decimal? amount)
         {
-            var exchange =  await _rates.ExchangeAsync(srcCurrency, dstCurrency, amount ?? decimal.One);
+            if (!(HttpContext.User.Identity is AccountIdentity identity))
+                return Unauthorized();
+            
+            // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
+            _logger.LogInformation($"User encoded as: {identity.Base64String} requested value change.");
+
+            var exchange = await _rates.
+                ExchangeAsync(srcCurrency, dstCurrency, amount ?? decimal.One);
             if (exchange.HasValue) return exchange.Value.DestinationAmount;
+            
+            // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
             _logger.LogDebug($"Can't exchange from '{srcCurrency}' to '{dstCurrency}'");
             return BadRequest("Invalid currency code");
         }

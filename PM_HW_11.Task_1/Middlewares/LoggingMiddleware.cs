@@ -11,7 +11,7 @@ namespace DepsWebApp.Middlewares
     /// <summary>
     /// Middleware to log raw data
     /// </summary>
-    public class LoggingMiddleware
+    internal class LoggingMiddleware
     {
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;

@@ -16,11 +16,7 @@ namespace DepsWebApp.Middlewares
             var exceptionName = context.Exception.GetType().Name;
             var errorCode = ConstructErrorResponse(exceptionName.ToLower());
 
-            var error = new ErrorDetailsModel
-            {
-                ErrorCode = errorCode,
-                ErrorMessage = context.Exception.Message
-            };
+            var error = new ErrorDetailsModel(errorCode, context.Exception.Message);
 
             context.Result = new JsonResult(error);
             return Task.CompletedTask;

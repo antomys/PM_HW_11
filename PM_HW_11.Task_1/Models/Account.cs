@@ -6,7 +6,7 @@ namespace DepsWebApp.Models
     /// <summary>
     /// Registration mode
     /// </summary>
-    public class Registration
+    public class Account
     {
         /// <summary>
         /// User login property
