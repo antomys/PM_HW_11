@@ -12,7 +12,7 @@
         /// <summary>
         /// Schema name
         /// </summary>
-        public const string Name = "Base64Schema";
+        public const string Name = "Base64";
         /// <summary>
         /// Type to schema
         /// </summary>

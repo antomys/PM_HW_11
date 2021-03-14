@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Security.Authentication;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using DepsWebApp.Services;
@@ -51,6 +52,8 @@ namespace DepsWebApp.Authentication
                 return AuthenticateResult.NoResult();
             try
             {
+                if (encodedString.Contains("base64", StringComparison.OrdinalIgnoreCase))
+                    encodedString = encodedString.Replace("base64", "", StringComparison.OrdinalIgnoreCase).Trim();
                 if (!await _accountService.GetAccount(encodedString))
                     throw new AuthenticationException(encodedString);
                 return AuthenticateResult.Success(
@@ -69,7 +72,7 @@ namespace DepsWebApp.Authentication
 
         private static bool GetAccountFromRequest(HttpRequest request, out string encodedString)
         {
-            encodedString = null;
+            encodedString = "";
             if (request.Headers.ContainsKey(HeaderNames.Authorization))
             {
                 encodedString = request.Headers[HeaderNames.Authorization].FirstOrDefault();

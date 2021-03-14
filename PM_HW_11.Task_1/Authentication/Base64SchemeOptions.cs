@@ -12,7 +12,7 @@ namespace DepsWebApp.Authentication
         /// </summary>
         public Base64SchemeOptions()
         {
-            ClaimsIssuer = "PM_HW_12";
+            ClaimsIssuer = Base64Scheme.Issuer;
         }
         
     }

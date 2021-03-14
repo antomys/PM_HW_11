@@ -56,7 +56,7 @@ namespace DepsWebApp
                 .AddAuthentication(Base64Scheme.Name)
                 .AddScheme<Base64SchemeOptions, Base64AuthenticationHandler>(
                     Base64Scheme.Name, Base64Scheme.Name, null);
-            
+
             //Add Account services for storing account <SINGLETON>
             services.AddSingleton<IAccountService, AccountService>();
 
