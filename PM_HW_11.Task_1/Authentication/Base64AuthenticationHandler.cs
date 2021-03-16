@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Http.Headers;
 using System.Security.Authentication;
 using System.Security.Claims;
-using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using DepsWebApp.Services;
@@ -12,7 +10,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace DepsWebApp.Authentication
 {
