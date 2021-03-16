@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Security.Authentication;
 using System.Security.Claims;
 using System.Text;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace DepsWebApp.Authentication
 {
@@ -52,8 +54,6 @@ namespace DepsWebApp.Authentication
                 return AuthenticateResult.NoResult();
             try
             {
-                if (encodedString.Contains("base64", StringComparison.OrdinalIgnoreCase))
-                    encodedString = encodedString.Replace("base64", "", StringComparison.OrdinalIgnoreCase).Trim();
                 if (!await _accountService.GetAccount(encodedString))
                     throw new AuthenticationException(encodedString);
                 return AuthenticateResult.Success(
@@ -73,11 +73,20 @@ namespace DepsWebApp.Authentication
         private static bool GetAccountFromRequest(HttpRequest request, out string encodedString)
         {
             encodedString = "";
-            if (request.Headers.ContainsKey(HeaderNames.Authorization))
+            if (!request.Headers.ContainsKey(HeaderNames.Authorization)) return false;
+            try
             {
-                encodedString = request.Headers[HeaderNames.Authorization].FirstOrDefault();
+                var authHeader =
+                    AuthenticationHeaderValue.Parse(request.Headers["Authorization"]);
+                if (!authHeader.Scheme.Equals(Base64Scheme.Name,StringComparison.OrdinalIgnoreCase))
+                    return false;
+                encodedString = authHeader.Parameter;
+                return !string.IsNullOrEmpty(encodedString);
             }
-            return !string.IsNullOrEmpty(encodedString);
+            catch (FormatException)
+            {
+                return false;
+            }
         }
     }
 }
