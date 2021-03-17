@@ -67,7 +67,7 @@ namespace PM_HW_11.Task_2.Input
                 else
                 {
                     inputModel = new LoginModel(RandomString(6, 24), RandomString(6, 24));
-                    expectedEncoded = Base64Encode($"{inputModel.Login}:{inputModel.Password}");
+                    //expectedEncoded = Base64Encode($"{inputModel.Login}:{inputModel.Password}");
                 }
                
                 
@@ -76,21 +76,18 @@ namespace PM_HW_11.Task_2.Input
                     new StringContent(serialized, Encoding.UTF8,"application/json");
                 
                 var responseMessage = await httpClient.PostAsync(inputUri,content);
+                var bse64 = Base64Encode($"{inputModel.Login}:{inputModel.Password}");
                 var responseBody = await responseMessage.Content.ReadAsStringAsync();
 
-                if (responseBody != null && isValid)
+                if (isValid)
                 {
-                    if(!Base64Collection.Contains(responseBody))
-                        Base64Collection.Enqueue(responseBody);
+                    if(!Base64Collection.Contains(bse64))
+                        Base64Collection.Enqueue(bse64);
                     Console.WriteLine($"Input URL: [{inputUri}]\n" +
                                       $"Input Body: {inputModel}\n" + 
                                       $"Expected code: [{value}]\n" +
-                                      $"Expected Encoded: [{expectedEncoded}]\n" +
-                                      $"Expected Decoded: [{Base64Decode(expectedEncoded)}]\n" +
                                       $"Received code: [{responseMessage.StatusCode}]\n" +
-                                      $"Received Encoded: [{responseBody}]\n" +
-                                      $"Received Decoded: [{Base64Decode(responseBody)}]\n" +
-                                      $"Test passed: [{expectedEncoded==responseBody}]\n");
+                                      $"Test passed: [{value==(int)responseMessage.StatusCode}]\n");
                 }
                 else
                 {
@@ -140,6 +137,7 @@ namespace PM_HW_11.Task_2.Input
                         var errorDeserialized = JsonSerializer.Deserialize<ErrorModel>(responseBody);
                         Console.WriteLine($"Input URL: [{inputUri}]\n" +
                                           $"Authorization header: {token}\n" +
+                                          $"Decoded header: {Base64Decode(token)}\n" +
                                           $"Expected Custom Error:[{expectedCustomErrorCode}]\n" +
                                           $"Received Code:[{errorDeserialized.Code}]\n" +
                                           $"Received Body: {errorDeserialized}\n" +
@@ -152,6 +150,7 @@ namespace PM_HW_11.Task_2.Input
                         var responseNumber = Convert.ToDecimal(responseBody); 
                         Console.WriteLine($"Input URL: [{inputUri}]\n" +
                                           $"Authorization header: {token}\n" +
+                                          $"Decoded header: {Base64Decode(token)}\n" +
                                           $"Expected :[{typeof(decimal)}]\n" +
                                           $"Received :[{responseNumber.GetType().Name}]\n" +
                                           $"Received Body:{responseNumber}\n" +
@@ -181,6 +180,7 @@ namespace PM_HW_11.Task_2.Input
         {
             Console.WriteLine($"Input URL: [{inputUri}]\n" +
                               $"Authorization header: {token}\n" +
+                              $"Decoded header: {Base64Decode(token)}\n" +
                               $"Expected Code:[{expectedCode}]\n" +
                               $"Received body {responseMessage}\n" +
                               $"Received Code:[{responseBody.StatusCode}]\n" +

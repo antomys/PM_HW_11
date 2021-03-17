@@ -1,13 +1,19 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Linq;
 using System.Threading.Tasks;
+using DepsWebApp.Models;
 
 namespace DepsWebApp.Services
 {
     internal class AccountService: IAccountService
     {
-        private readonly BlockingCollection<string> _accounts = new BlockingCollection<string>();
+        //private readonly ConcurrentDictionary<string, Account> _accounts = new ConcurrentDictionary<string, Account>();
+        private readonly ApplicationDbContext _applicationDbContext;
+
+        public AccountService(ApplicationDbContext applicationDbContext)
+        {
+            _applicationDbContext = applicationDbContext;
+        }
         
         ///<inheritdoc/>
         public Task<string> RegisterAsync(string login, string password)
@@ -18,23 +24,22 @@ namespace DepsWebApp.Services
             if (string.IsNullOrEmpty(password))
                 throw new ArgumentNullException(nameof(password));
             
-            var toEncodeString = $"{login}:{password}";
-            var encodedCredentials = Base64Encode(toEncodeString);
-
-            if (_accounts.Contains(encodedCredentials))
+            if (_applicationDbContext.Accounts.Find(login) != null)
             {
                 return Task.FromException<string>(new InvalidOperationException("Account already exists"));
             }
 
-            _accounts.TryAdd(encodedCredentials);
-            return Task.FromResult(encodedCredentials);
+            _applicationDbContext.Accounts.AddAsync(new Account {Login = login, Password = password});
+            _applicationDbContext.SaveChangesAsync();
             
+            return Task.FromResult(string.Empty);
         }
 
-        /// <inheritdoc />
+        ///<inheritdoc/>
         public Task<bool> GetAccount(string encodedString)
         {
-            return Task.FromResult(_accounts.Contains(encodedString));
+            var credentials = Base64Decode(encodedString).Split(":");
+            return Task.FromResult(_applicationDbContext.Accounts.Any(x=> x.Login==credentials[0] && x.Password==credentials[1]));
         }
         
         /// <summary>
@@ -45,6 +50,15 @@ namespace DepsWebApp.Services
         private static string Base64Encode(string plainText) {
             var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
             return Convert.ToBase64String(plainTextBytes);
+        }
+        /// <summary>
+        /// Method to decode account credentials to Base64
+        /// </summary>
+        /// <param name="base64EncodedData">input encoded string</param>
+        /// <returns>decoded string</returns>
+        private static string Base64Decode(string base64EncodedData) {
+            var base64EncodedBytes = Convert.FromBase64String(base64EncodedData);
+            return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
         }
     }
 }

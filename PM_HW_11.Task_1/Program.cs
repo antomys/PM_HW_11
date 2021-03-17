@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -30,6 +31,7 @@ namespace DepsWebApp
                         .WriteTo.File("app.log")
                         .CreateLogger());
                 })
+                .ConfigureServices(collection => collection.AddHostedService<MigrationsService>())
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

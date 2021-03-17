@@ -49,7 +49,7 @@ namespace DepsWebApp.Controllers
                 
                 // ReSharper disable once TemplateIsNotCompileTimeConstantProblem
                 _logger.LogInformation($"Registered user:{result}");
-                return Ok(result);
+                return Ok();
                 
             }
             catch (Exception exception)

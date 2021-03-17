@@ -11,6 +11,7 @@ using DepsWebApp.Middlewares;
 using DepsWebApp.Options;
 using DepsWebApp.Services;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 
 namespace DepsWebApp
@@ -58,8 +59,13 @@ namespace DepsWebApp
                     Base64Scheme.Name, Base64Scheme.Name, null);
 
             //Add Account services for storing account <SINGLETON>
-            services.AddSingleton<IAccountService, AccountService>();
-
+            services.AddTransient<IAccountService, AccountService>();
+            
+            //Adding database
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseNpgsql(Configuration.GetConnectionString("connectionString")), ServiceLifetime.Transient);
+            
+            
             // Add NbuClient as Transient
             services.AddHttpClient<IRatesProviderClient, NbuClient>()
                 .ConfigureHttpClient(client => client.Timeout = TimeSpan.FromSeconds(10));
